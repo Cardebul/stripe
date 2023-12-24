@@ -40,8 +40,8 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+const stripe = Stripe("{{ STRIPE_PUBLISHABLE_KEY }}");
 
-const stripe = Stripe("pk_test_51OQBHFKpx1WAHUwKbcKrLntDzeD4mao5A8PwuHZ39jFaAmdLHHwpiai6wTX1l2jD0BH3xnFzIpeUli4ITLr0AnKq00HZUqOkz6");
 console.log("Sanity check!");
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 

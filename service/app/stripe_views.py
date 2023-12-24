@@ -1,22 +1,22 @@
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_GET
-from django.shortcuts import redirect
 import json
+
 import stripe
 from django.conf import settings
-from django.http import  HttpResponse, HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.http.response import JsonResponse
+from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-from .models import Item, Price, Order
+from django.views.decorators.http import require_GET
 
-
+from .models import Item, Order, Price
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 @require_GET
 def create_checkout_session(request, pk):
-    domain_url = "http://localhost:8000/"
+    domain_url = settings.DOMAIN
     try:
         cancel_url = domain_url + f"item/{pk}"
         item = Item.objects.get(pk=pk)
@@ -43,7 +43,8 @@ def create_checkout_session(request, pk):
 @require_GET
 @login_required
 def create_checkout_session_order(request):
-    domain_url = "http://localhost:8000/"
+    domain_url = settings.DOMAIN
+    
     try:
         cancel_url = domain_url + f"order"
         prices = Price.objects.filter(
@@ -103,7 +104,6 @@ def create_payment_intent(request, pk):
 
 @csrf_exempt
 def stripe_webhook(request):
-    stripe.api_key = settings.STRIPE_SECRET_KEY
     endpoint_secret = settings.STRIPE_ENDPOINT_SECRET
     payload = request.body
     sig_header = request.META["HTTP_STRIPE_SIGNATURE"]

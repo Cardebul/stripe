@@ -1,13 +1,16 @@
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-import stripe
 from typing import Any
-from django.http.response import JsonResponse
-from django.views.generic.base import TemplateView
-from django.views.generic import DetailView, ListView
-from .models import Item, Price, Order, Order_of_items, Discount, Tax
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.http.response import JsonResponse
+from django.shortcuts import render
+from django.views.decorators.http import require_POST
+from django.views.generic import DetailView, ListView
+from django.views.generic.base import TemplateView
+
+from .models import Discount, Item, Order, Order_of_items, Tax
 
 
 class HomePageView(TemplateView):
@@ -28,6 +31,7 @@ class ItemView(DetailView):
         product = item.prices.filter(currency=item.currency).first()
         context["price"] = product.price
         context["currency"] = product.currency
+        context['STRIPE_PUBLISHABLE_KEY'] = settings.STRIPE_PUBLISHABLE_KEY
         return context
 
 
@@ -51,6 +55,7 @@ class ListItemsOrderView(LoginRequiredMixin, ListItemsAbstract):
         user = self.request.user
         items_in_order = Item.objects.filter(orders__order__user=user).prefetch_related('orders__order').distinct()
         context['items_in_order'] = items_in_order
+        context['STRIPE_PUBLISHABLE_KEY'] = settings.STRIPE_PUBLISHABLE_KEY
         try:
             orders = user.orders
         except (ObjectDoesNotExist, Exception):
@@ -98,3 +103,8 @@ def process_objects(request):
     finally:
         return JsonResponse(
             {"message": "Объекты успешно обработаны!"}, status=200)
+
+
+def handler500(request, *args, **argv):
+
+    return render(request, '500.html', status=500)

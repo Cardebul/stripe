@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
-from . import stripe_views
+
+from . import stripe_views, views
 
 urlpatterns = [
     path("", views.HomePageView.as_view(), name="home"),

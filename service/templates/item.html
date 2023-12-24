@@ -25,9 +25,11 @@
     <p class="result-message hidden"> Payment succeeded, see the result in your <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again. </p> {% csrf_token %}
   </form>
   <script>
-    const stripe = Stripe("pk_test_51OQBHFKpx1WAHUwKbcKrLntDzeD4mao5A8PwuHZ39jFaAmdLHHwpiai6wTX1l2jD0BH3xnFzIpeUli4ITLr0AnKq00HZUqOkz6");
-    console.log("Sanity check!");
+    const stripe = Stripe("{{ STRIPE_PUBLISHABLE_KEY }}");
+
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    console.log("Sanity check!");
     document.querySelector("#submitBtn").addEventListener("click", () => {
       const itemId = document.querySelector("#submitBtn").getAttribute("data-item-id");
       console.log(itemId);

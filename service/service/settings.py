@@ -10,22 +10,27 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tnm)o+!$p3(#j-#=0v+@+_zm0v@*%pctp7+zyx@+(h&4ust@o5'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -129,12 +134,14 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51OQBHFKpx1WAHUwKbcKrLntDzeD4mao5A8PwuHZ39jFaAmdLHHwpiai6wTX1l2jD0BH3xnFzIpeUli4ITLr0AnKq00HZUqOkz6'
-STRIPE_SECRET_KEY = 'sk_test_51OQBHFKpx1WAHUwKznAijljTtnPpCi6l4ush6zKdlJDROl7mufHgBv4HBWVTWLKvXEYETW42XSdZCBmaML2ZEqyt00gG8sv1id'
-STRIPE_ENDPOINT_SECRET = 'whsec_d5d2d534af15d84c956d51eca84b8377cbe7fe3a25a27db81a6bb7e3bd7c7055'
-
 LOGIN_REDIRECT_URL = 'home'
 
 
 LOGIN_URL = 'login'
+
+
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_ENDPOINT_SECRET = os.getenv("STRIPE_ENDPOINT_SECRET")
+
+DOMAIN = os.getenv("DOMAIN")

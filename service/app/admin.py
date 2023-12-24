@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Item, Price, Order, Order_of_items, Discount, Tax
-# Register your models here.
+
+from .models import Discount, Item, Order, Order_of_items, Price, Tax
 
 
 @admin.register(Price)
