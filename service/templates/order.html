@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+{% for item in object_list %}
+
+<div class="card" >
+    <div class="checkbox-wrapper">
+        <input type="checkbox" name="object"  value="{{ item.id }}" onchange="toggleCheckbox(this)" {% if item in items_in_order %} checked {% endif %}>
+        </div>
+    <h1>{{ item.name }}</h1>
+    {% for price in item.prices.all %}
+        {{ price.price|floatformat:"2g" }}
+        {{ price.currency }}
+        {% if item.currency == price.currency and item.prices.all.count > 1  %}
+        Основная цена
+        {% endif %}
+    {% endfor %}
+    {% csrf_token %}
+
+
+    <p><strong>{{ item.description }}</strong></p>
+</div>
+{% endfor %}
+<div>
+    <div class="checkbox-promo">Промокод FRIENDS20
+        <input  type="checkbox" name="object" value="FRIENDS20" onchange="toggleCheckbox(this)" {% if discount  %} checked {% endif %}>
+    </div>
+    <div class="checkbox-promo">TAX 10%
+        <input type="checkbox" name="object" value="GST" onchange="toggleCheckbox(this)" {% if tax  %} checked {% endif %}>
+    </div>
+</div>
+<div>
+    <p><button class="button is-primary" id="submitBtn" data-item-id="{{ item.id }}">Buy</button></p>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+const stripe = Stripe("pk_test_51OQBHFKpx1WAHUwKbcKrLntDzeD4mao5A8PwuHZ39jFaAmdLHHwpiai6wTX1l2jD0BH3xnFzIpeUli4ITLr0AnKq00HZUqOkz6");
+console.log("Sanity check!");
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+
+document.querySelector("#submitBtn").addEventListener("click", () => {
+  
+  fetch(`{% url 'order_confirm' %}`) 
+  .then((result) => { return result.json(); })
+  .then((data) => {
+    console.log(data);
+    // Redirect to Stripe Checkout
+    return stripe.redirectToCheckout({sessionId: data.sessionId})
+  })
+  .then((res) => {
+    console.log(res);
+  });
+});
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function toggleCheckbox(element) {
+    var objectID = element.value;
+    var isChecked = element.checked;
+    var csrfToken = getCookie('csrftoken');
+
+    $.ajax({
+        url: '{% url "process_objects" %}',
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        data: {
+            object_id: objectID,
+            is_checked: isChecked
+        },
+        success: function(response) {
+            console.log('Data successfully updated');
+        },
+        error: function(response) {
+            console.error('An error occurred while updating data');
+        }
+    });
+}
+</script>
+{% endblock %}

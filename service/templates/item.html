@@ -1,0 +1,130 @@
+{% extends 'base.html' %} 
+{% block content %} 
+<div class="card">
+  <h1>{{ item.name }}</h1>
+  <p class="price">{{ price }} {{ currency }}</p>
+  <p>
+    <strong>{{ item.description }}</strong>
+  </p>
+</div>
+<h2>Можно купить через сервис</h2>
+<p>
+  <button class="button is-primary" id="submitBtn" data-item-id="{{ item.id }}">Buy</button>
+</p>
+<div class="product">
+  <h2>Или оплатить на сайте</h2>
+  <form id="payment-form">
+    <input type="text" id="email" placeholder="Email address" />
+    <div id="card-element">
+    </div>
+    <button id="submit">
+      <div class="spinner hidden" id="spinner"></div>
+      <span id="button-text">Pay</span>
+    </button>
+    <p id="card-error" role="alert"></p>
+    <p class="result-message hidden"> Payment succeeded, see the result in your <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again. </p> {% csrf_token %}
+  </form>
+  <script>
+    const stripe = Stripe("pk_test_51OQBHFKpx1WAHUwKbcKrLntDzeD4mao5A8PwuHZ39jFaAmdLHHwpiai6wTX1l2jD0BH3xnFzIpeUli4ITLr0AnKq00HZUqOkz6");
+    console.log("Sanity check!");
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    document.querySelector("#submitBtn").addEventListener("click", () => {
+      const itemId = document.querySelector("#submitBtn").getAttribute("data-item-id");
+      console.log(itemId);
+      fetch(`/buy/${itemId}`).then((result) => {
+        return result.json();
+      }).then((data) => {
+        console.log(data);
+        return stripe.redirectToCheckout({
+          sessionId: data.sessionId
+        })
+      }).then((res) => {
+        console.log(res);
+      });
+    });
+    var checkoutButton = document.getElementById("checkout-button");
+    document.querySelector("#submit").disabled = true;
+    var elements = stripe.elements();
+    var style = {
+      base: {
+        color: "#32325d",
+        fontFamily: 'Arial, sans-serif',
+        fontSmoothing: "antialiased",
+        fontSize: "16px",
+        "::placeholder": {
+          color: "#32325d"
+        }
+      },
+      invalid: {
+        fontFamily: 'Arial, sans-serif',
+        color: "#fa755a",
+        iconColor: "#fa755a"
+      }
+    };
+    var card = elements.create("card", {
+      style: style
+    });
+    card.mount("#card-element");
+    card.on("change", function(event) {
+      document.querySelector("#submit").disabled = event.empty;
+      document.querySelector("#card-error").textContent = event.error ? event.error.message : "";
+    });
+    var form = document.getElementById("payment-form");
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      fetch("{% url 'create-payment-intent' item.id %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({
+          email: document.getElementById('email').value
+        })
+      }).then(function(result) {
+        return result.json();
+      }).then(function(data) {
+        payWithCard(stripe, card, data.clientSecret);
+      });
+    });
+    var payWithCard = function(stripe, card, clientSecret) {
+      loading(true);
+      stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: card
+        }
+      }).then(function(result) {
+        if (result.error) {
+          showError(result.error.message);
+        } else {
+          orderComplete(result.paymentIntent.id);
+        }
+      });
+    };
+    var orderComplete = function(paymentIntentId) {
+      loading(false);
+      document.querySelector(".result-message a").setAttribute("href", "https://dashboard.stripe.com/test/payments/" + paymentIntentId);
+      document.querySelector(".result-message").classList.remove("hidden");
+      document.querySelector("#submit").disabled = true;
+    };
+    var showError = function(errorMsgText) {
+      loading(false);
+      var errorMsg = document.querySelector("#card-error");
+      errorMsg.textContent = errorMsgText;
+      setTimeout(function() {
+        errorMsg.textContent = "";
+      }, 4000);
+    };
+    var loading = function(isLoading) {
+      if (isLoading) {
+        document.querySelector("#submit").disabled = true;
+        document.querySelector("#spinner").classList.remove("hidden");
+        document.querySelector("#button-text").classList.add("hidden");
+      } else {
+        document.querySelector("#submit").disabled = false;
+        document.querySelector("#spinner").classList.add("hidden");
+        document.querySelector("#button-text").classList.remove("hidden");
+      }
+    };
+  </script> 
+{% endblock %}

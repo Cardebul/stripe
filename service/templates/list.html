@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for item in object_list %}
+<a href="{% url 'item' item.pk %}">
+    <div class="card" >
+        <h1>{{ item.name }}</h1>
+        <!-- <p class="price">${{ item.price }}</p> -->
+        {% for price in item.prices.all %}
+        <p class="price"></p>
+            {{ price.price|floatformat:"2g" }}
+            {{ price.currency }}
+            {% if item.currency == price.currency and item.prices.all.count > 1  %}
+            Основная цена
+            {% endif %}
+        </p>
+        {% endfor %}
+
+
+        <p><strong>{{ item.description }}</strong></p>
+    </div>
+</a>
+{% endfor %}
+{% endblock %}

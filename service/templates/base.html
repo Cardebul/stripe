@@ -1,0 +1,47 @@
+{% load static %} {% load django_bootstrap5 %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>stripe testing</title>
+    <meta name="description" content="A demo of a payment on Stripe" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://js.stripe.com/v3/"></script>
+    <script defer src="https://use.fontawesome.com/releases/v6.4.0/js/all.js"></script>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+  </head>
+  <header class="site-header">
+    <div class="site-identity">
+      <h1>
+        <a href="{% url 'home' %}">Stripe API Testing</a>
+      </h1>
+    </div>
+    <nav class="site-navigation">
+      <ul class="nav">
+        <li>
+          <a href="{% url 'list' %}">All Items</a>
+        </li>
+        <li>
+          <a href="{% url 'order' %}">Order</a>
+        </li>
+        {% if user.is_authenticated %} <li>
+          <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"> Выйти </a>
+          <form id="logout-form" action="{% url 'logout' %}" method="POST" style="display: none;"> {% csrf_token %} </form>
+        </li> {% else %} <li>
+          <a class="dropdown-item" href="{% url 'login' %}">Войти</a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="{% url 'registration' %}">Регистрация</a>
+        </li> {% endif %}
+      </ul>
+    </nav>
+  </header>
+  <body>
+    <section class="section">
+      <div class="container"> {% block content %} {% endblock %} </div>
+    </section>
+  </body>
+  <footer>
+    <strong>При оплате вводите тестовую карту <b style="color: rgb(112, 26, 101);">4242 4242 4242 4242</b> и любые данные в другие поля </strong>
+  </footer>
+</html>
