@@ -30,10 +30,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = [
- os.getenv("LOCAL"),
-    os.getenv("NAME_LOCAL"), os.getenv("DOMAIN")
-]
+
+ALLOWED_HOSTS = [os.getenv("IP"), os.getenv("LOCAL"),
+                 os.getenv("NAME_LOCAL"), os.getenv("DOMAIN_URL")]
+
 
 
 # Application definition
@@ -162,3 +162,11 @@ STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 STRIPE_ENDPOINT_SECRET = os.getenv("STRIPE_ENDPOINT_SECRET")
 
 DOMAIN = os.getenv("DOMAIN")
+
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8000',
+
+]
+
+CSRF_TRUSTED_ORIGINS = [f'https://{NAME}' for NAME in ALLOWED_HOSTS]

@@ -14,11 +14,11 @@ from .models import Discount, Item, Order, Order_of_items, Tax
 
 
 class HomePageView(TemplateView):
-    template_name = "home.html"
+    template_name = "pages/home.html"
 
 
 class SuccessView(TemplateView):
-    template_name = "success.html"
+    template_name = "pages/success.html"
 
 
 class ItemView(DetailView):
@@ -105,6 +105,10 @@ def process_objects(request):
             {"message": "Объекты успешно обработаны!"}, status=200)
 
 
-def handler500(request, *args, **argv):
+def handler500(request, *args, **kwargs):
 
-    return render(request, '500.html', status=500)
+    return render(request, 'pages/500.html', status=500)
+
+def page_not_found(request, exception):
+
+    return render(request, 'pages/404.html', status=404)
