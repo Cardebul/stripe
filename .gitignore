@@ -3,3 +3,4 @@ venv
 q.txt
 stripe_acc.txt
 db.sqlite3
+.git
