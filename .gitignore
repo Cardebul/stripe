@@ -1,0 +1,5 @@
+venv
+.env
+q.txt
+stripe_acc.txt
+db.sqlite3
