@@ -50,6 +50,10 @@ python manage.py loaddata --exclude auth.permission --exclude contenttypes db.js
 
 
 ```
+python manage.py collectstatic
+```
+
+```
 cd /backend_static
 ```
 
