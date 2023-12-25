@@ -21,9 +21,8 @@ git clone git@github.com:Cardebul/stripe.git
 cd stripe
 ```
 
-3. Создайте и активируйте виртуальное окружение:
+3. Создайте и заполните .env по образцу:
 
-создайте и заполните .env по образцу
 STRIPE_SECRET_KEY=<your_stripe_secret_key>
 STRIPE_PUBLISHABLE_KEY=..
 ...
